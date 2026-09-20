@@ -524,16 +524,11 @@ def show_letter_reference():
             pronunciation = transliterate_hebrew(hebrew)
             keys = typing_hebrew(hebrew)
 
-            # Show both versions - API output varies
-            hebrew_alt = fix_reversed_words(hebrew)
-
             print()
-            print(f"  {T_WHITE}English:{T_RESET}       {word}")
-            print(f"  {T_CYAN}Hebrew v1:{T_RESET}     {hebrew}")
-            print(f"  {T_CYAN}Hebrew v2:{T_RESET}     {hebrew_alt}")
-            print(f"  {T_GRAY}(copy whichever displays correct in Discord){T_RESET}")
-            print(f"  {T_YELLOW}Say:{T_RESET}          {pronunciation}")
-            print(f"  {T_MAGENTA}Type:{T_RESET}         {keys}")
+            print(f"  {T_WHITE}English:{T_RESET}  {word}")
+            print(f"  {T_YELLOW}Say:{T_RESET}      {pronunciation}")
+            print(f"  {T_MAGENTA}Type:{T_RESET}     {keys}")
+            print(f"  {T_GRAY}(Hebrew output removed - use option 1/3 for reliable Hebrew){T_RESET}")
 
             # TTS
             if speak_hebrew(hebrew):
@@ -587,7 +582,7 @@ def show_main_menu():
     print(f"{T_GREEN}{'=' * 50}{T_RESET}")
     print()
     print(f"  {T_YELLOW}1{T_RESET}. Paste & process lyrics")
-    print(f"  {T_YELLOW}2{T_RESET}. English → Hebrew (online translation)")
+    print(f"  {T_YELLOW}2{T_RESET}. English → pronunciation + keys (TTS)")
     print(f"  {T_YELLOW}3{T_RESET}. Hebrew practice (offline - paste Hebrew)")
     print(f"  {T_GRAY}0{T_RESET}. Exit")
     print("-" * 50)
