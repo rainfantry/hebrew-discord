@@ -24,6 +24,27 @@ try:
 except ImportError:
     HAS_TRANSLATE = False
 
+import subprocess
+import tempfile
+
+def speak_hebrew(text, voice="he-IL-HilaNeural"):
+    """Speak Hebrew text using edge-tts"""
+    try:
+        with tempfile.NamedTemporaryFile(suffix='.mp3', delete=False) as f:
+            temp_path = f.name
+
+        result = subprocess.run(
+            [sys.executable, "-m", "edge_tts", "--voice", voice, "--text", text, "--write-media", temp_path],
+            capture_output=True, text=True
+        )
+
+        if result.returncode == 0:
+            subprocess.Popen(["cmd", "/c", "start", "", temp_path], shell=True)
+            return True
+    except:
+        pass
+    return False
+
 # ANSI escape sequences for Discord
 ESC = "\x1b"
 D_YELLOW = f"{ESC}[2;33m"
@@ -495,6 +516,10 @@ def show_letter_reference():
             print(f"  {T_CYAN}Hebrew:{T_RESET}   {reverse_for_powershell(hebrew)}")
             print(f"  {T_YELLOW}Say:{T_RESET}      {pronunciation}")
             print(f"  {T_MAGENTA}Type:{T_RESET}     {keys}")
+
+            # TTS
+            if speak_hebrew(hebrew):
+                print(f"  {T_GREEN}[playing audio]{T_RESET}")
             print()
         else:
             print(f"  {T_GRAY}{hebrew}{T_RESET}")
