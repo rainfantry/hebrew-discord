@@ -19,9 +19,8 @@ except ImportError:
     HAS_CLIPBOARD = False
 
 try:
-    from googletrans import Translator
+    from deep_translator import GoogleTranslator
     HAS_TRANSLATE = True
-    translator = Translator()
 except ImportError:
     HAS_TRANSLATE = False
 
@@ -80,10 +79,9 @@ def transliterate_hebrew(text):
 
 def translate_line(text):
     if not HAS_TRANSLATE:
-        return "[install googletrans]"
+        return "[pip install deep-translator]"
     try:
-        result = translator.translate(text, src='he', dest='en')
-        return result.text
+        return GoogleTranslator(source='he', target='en').translate(text)
     except:
         return "[translation error]"
 
