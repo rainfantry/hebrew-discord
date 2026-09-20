@@ -178,15 +178,20 @@ def format_terminal(lines_data):
             output += f"{T_WHITE}{english}{T_RESET}\n\n"
     return output.rstrip('\n')
 
+def reverse_for_powershell(text):
+    """Reverse Hebrew text so PowerShell's broken RTL displays it correctly"""
+    return text[::-1]
+
 def format_terminal_full(lines_data):
-    """Terminal with all 3 lines (Hebrew will display backwards but included)"""
+    """Terminal with all 3 lines - Hebrew pre-reversed for correct PowerShell display"""
     output = ""
     for item in lines_data:
         if item is None:
             output += f"{T_GRAY}---{T_RESET}\n\n"
         else:
             translit, english, hebrew = item
-            output += f"{T_CYAN}{hebrew}{T_RESET}  {T_GRAY}(displays backwards in terminal){T_RESET}\n"
+            hebrew_display = reverse_for_powershell(hebrew)
+            output += f"{T_CYAN}{hebrew_display}{T_RESET}\n"
             output += f"{T_YELLOW}{T_BOLD}{translit}{T_RESET}\n"
             output += f"{T_WHITE}{english}{T_RESET}\n\n"
     return output.rstrip('\n')
