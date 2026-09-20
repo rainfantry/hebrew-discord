@@ -524,13 +524,14 @@ def show_letter_reference():
             pronunciation = transliterate_hebrew(hebrew)
             keys = typing_hebrew(hebrew)
 
-            # Fix reversed words from API
-            hebrew_fixed = fix_reversed_words(hebrew)
+            # Show both versions - API output varies
+            hebrew_alt = fix_reversed_words(hebrew)
 
             print()
             print(f"  {T_WHITE}English:{T_RESET}       {word}")
-            print(f"  {T_CYAN}Hebrew (PS):{T_RESET}   {reverse_for_powershell(hebrew_fixed)}")
-            print(f"  {T_CYAN}Hebrew (copy):{T_RESET} {hebrew_fixed}")
+            print(f"  {T_CYAN}Hebrew v1:{T_RESET}     {hebrew}")
+            print(f"  {T_CYAN}Hebrew v2:{T_RESET}     {hebrew_alt}")
+            print(f"  {T_GRAY}(copy whichever displays correct in Discord){T_RESET}")
             print(f"  {T_YELLOW}Say:{T_RESET}          {pronunciation}")
             print(f"  {T_MAGENTA}Type:{T_RESET}         {keys}")
 
