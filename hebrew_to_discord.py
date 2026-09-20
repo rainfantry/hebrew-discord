@@ -19,7 +19,7 @@ except ImportError:
     HAS_CLIPBOARD = False
 
 try:
-    from deep_translator import GoogleTranslator
+    from deep_translator import MyMemoryTranslator
     HAS_TRANSLATE = True
 except ImportError:
     HAS_TRANSLATE = False
@@ -77,12 +77,16 @@ def transliterate_hebrew(text):
 
     return ' '.join(w.capitalize() for w in text.split())
 
+_translator = None
 def translate_line(text):
+    global _translator
     if not HAS_TRANSLATE:
         return "[pip install deep-translator]"
     try:
-        return GoogleTranslator(source='he', target='en').translate(text)
-    except:
+        if _translator is None:
+            _translator = MyMemoryTranslator(source='he-IL', target='en-GB')
+        return _translator.translate(text)
+    except Exception as e:
         return "[translation error]"
 
 # ============= OUTPUT FORMATTERS =============
