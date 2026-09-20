@@ -14,6 +14,8 @@ He gave me knowledge, patience, and mentorship when no one else would.
 
 ---
 
+![Demo](DEMO.gif)
+
 ![Preview](preview.png)
 ![Typing Practice](שלום.png)
 
