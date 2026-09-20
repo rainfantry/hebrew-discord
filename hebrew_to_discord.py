@@ -560,7 +560,20 @@ def hebrew_practice_mode():
     print(f"  {T_YELLOW}│{T_RESET} {T_CYAN}ז{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ס{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ב{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ה{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}נ{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}מ{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}צ{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ת{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ץ{T_RESET} {T_YELLOW}│{T_RESET}")
     print(f"  {T_YELLOW}└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┘{T_RESET}")
     print()
-    print(f"{T_GREEN}Paste Hebrew words/phrases (or 'q' to quit):{T_RESET}")
+
+    # Letter reference
+    print(f"  {T_GRAY}Key → Hebrew{T_RESET}")
+    print(f"  {T_GRAY}A=ש B=נ C=ב D=ג E=ק F=כ G=ע H=י I=ן J=ח K=ל L=ך M=צ{T_RESET}")
+    print(f"  {T_GRAY}N=מ O=ם P=פ R=ר S=ד T=א U=ו V=ה X=ס Y=ט Z=ז ,=ת .=ץ ;=ף{T_RESET}")
+    print()
+
+    # Examples
+    print(f"{T_GREEN}Examples:{T_RESET}")
+    print(f"  {T_YELLOW}AKUO{T_RESET} → שלום (shalom)")
+    print(f"  {T_YELLOW},USV{T_RESET} → תודה (toda)")
+    print(f"  {T_YELLOW},UFBV{T_RESET} → תוכנה (software)")
+    print()
+    print(f"{T_GREEN}Paste Hebrew (or 'q' to quit):{T_RESET}")
     print()
 
     while True:
@@ -578,10 +591,16 @@ def hebrew_practice_mode():
         keys = typing_hebrew(hebrew)
 
         print()
-        print(f"  {T_CYAN}Hebrew (PS):{T_RESET}   {reverse_for_powershell(hebrew)}")
-        print(f"  {T_CYAN}Hebrew (copy):{T_RESET} {hebrew}")
-        print(f"  {T_YELLOW}Say:{T_RESET}          {pronunciation}")
-        print(f"  {T_MAGENTA}Type:{T_RESET}         {keys}")
+        print(f"  {T_YELLOW}Say:{T_RESET}   {pronunciation}")
+        print(f"  {T_MAGENTA}Type:{T_RESET}  {keys}")
+        print()
+        print(f"  {T_GREEN}Copy for Discord:{T_RESET}")
+        print(f"  {hebrew}")
+
+        # Copy to clipboard
+        if HAS_CLIPBOARD:
+            pyperclip.copy(hebrew)
+            print(f"  {T_GREEN}[copied to clipboard]{T_RESET}")
 
         # TTS
         if speak_hebrew(hebrew):
