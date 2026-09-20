@@ -11,6 +11,7 @@ import sys
 import re
 import os
 from datetime import datetime
+import msvcrt  # Windows live key capture
 
 try:
     import pyperclip
@@ -184,6 +185,55 @@ def keys_to_hebrew(keys_text):
         elif char == ' ':
             result.append(' ')
     return ''.join(result)
+
+def live_type_hebrew():
+    """Live typing: press QWERTY keys, see Hebrew build up in real-time."""
+    hebrew_chars = []
+    keys_pressed = []
+
+    print(f"  {T_GRAY}Type using QWERTY keys (Backspace to delete, Enter when done):{T_RESET}")
+    print(f"  {T_CYAN}Hebrew: {T_RESET}", end='', flush=True)
+
+    while True:
+        key = msvcrt.getwch()
+
+        # Enter - done
+        if key == '\r':
+            print()
+            break
+
+        # Backspace - delete last char
+        if key == '\b':
+            if hebrew_chars:
+                hebrew_chars.pop()
+                keys_pressed.pop()
+                # Clear line and reprint
+                hebrew_str = ''.join(hebrew_chars)
+                print(f"\r  {T_CYAN}Hebrew: {T_RESET}{hebrew_str}    ", end='', flush=True)
+                print(f"\r  {T_CYAN}Hebrew: {T_RESET}{hebrew_str}", end='', flush=True)
+            continue
+
+        # Escape - cancel
+        if key == '\x1b':
+            print()
+            return None, None
+
+        # Space
+        if key == ' ':
+            hebrew_chars.append(' ')
+            keys_pressed.append(' ')
+        # Map QWERTY to Hebrew
+        elif key.lower() in QWERTY_TO_HEBREW:
+            hebrew_chars.append(QWERTY_TO_HEBREW[key.lower()])
+            keys_pressed.append(key.upper())
+        else:
+            continue  # ignore unmapped keys
+
+        # Reprint the line with new char
+        hebrew_str = ''.join(hebrew_chars)
+        print(f"\r  {T_CYAN}Hebrew: {T_RESET}{hebrew_str}", end='', flush=True)
+
+    return ''.join(hebrew_chars), ''.join(keys_pressed)
 
 def typing_hebrew(text):
     """Convert Hebrew to Windows Standard Hebrew keyboard keys.
@@ -628,39 +678,75 @@ def hebrew_practice_mode():
     print(f"  {T_YELLOW},USV{T_RESET} → תודה (toda)")
     print(f"  {T_YELLOW},UFBV{T_RESET} → תוכנה (software)")
     print()
-    print(f"{T_GREEN}Paste Hebrew (or 'q' to quit):{T_RESET}")
+    print(f"{T_GREEN}Mode:{T_RESET}")
+    print(f"  {T_YELLOW}T{T_RESET} = Live TYPE (press QWERTY keys, see Hebrew)")
+    print(f"  {T_YELLOW}P{T_RESET} = PASTE Hebrew text")
+    print(f"  {T_GRAY}Q{T_RESET} = Quit")
     print()
 
     while True:
-        hebrew = input(f"{T_CYAN}Hebrew: {T_RESET}").strip()
-        if not hebrew or hebrew.lower() == 'q':
+        mode = input(f"{T_CYAN}[T/P/Q]: {T_RESET}").strip().lower()
+
+        if mode == 'q' or mode == '':
             break
 
-        # Check if actually Hebrew
-        if not any('֐' <= c <= '׿' for c in hebrew):
-            print(f"  {T_GRAY}(not Hebrew text){T_RESET}")
+        if mode == 't':
+            # Live typing mode
             print()
-            continue
+            hebrew, keys = live_type_hebrew()
+            if hebrew is None:
+                print(f"  {T_GRAY}(cancelled){T_RESET}")
+                print()
+                continue
+            if not hebrew.strip():
+                continue
 
-        pronunciation = transliterate_hebrew(hebrew)
-        keys = typing_hebrew(hebrew)
+            pronunciation = transliterate_hebrew(hebrew)
 
-        print()
-        print(f"  {T_YELLOW}Say:{T_RESET}   {pronunciation}")
-        print(f"  {T_MAGENTA}Type:{T_RESET}  {keys}")
-        print()
-        print(f"  {T_RED}COPY FOR DISCORD (looks wrong here, pastes correct):{T_RESET}")
-        print(f"  {T_RED}{hebrew}{T_RESET}")
+            print()
+            print(f"  {T_YELLOW}Say:{T_RESET}   {pronunciation}")
+            print(f"  {T_MAGENTA}Typed:{T_RESET} {keys}")
+            print()
+            print(f"  {T_RED}COPY FOR DISCORD (looks wrong here, pastes correct):{T_RESET}")
+            print(f"  {T_RED}{hebrew}{T_RESET}")
 
-        # Copy to clipboard
-        if HAS_CLIPBOARD:
-            pyperclip.copy(hebrew)
-            print(f"  {T_GREEN}[copied to clipboard]{T_RESET}")
+            if HAS_CLIPBOARD:
+                pyperclip.copy(hebrew)
+                print(f"  {T_GREEN}[copied to clipboard]{T_RESET}")
 
-        # TTS
-        if speak_hebrew(hebrew):
-            print(f"  {T_GREEN}[playing audio]{T_RESET}")
-        print()
+            if speak_hebrew(hebrew):
+                print(f"  {T_GREEN}[playing audio]{T_RESET}")
+            print()
+
+        elif mode == 'p':
+            # Paste mode
+            print()
+            hebrew = input(f"{T_CYAN}Paste Hebrew: {T_RESET}").strip()
+            if not hebrew:
+                continue
+
+            if not any('֐' <= c <= '׿' for c in hebrew):
+                print(f"  {T_GRAY}(not Hebrew text){T_RESET}")
+                print()
+                continue
+
+            pronunciation = transliterate_hebrew(hebrew)
+            keys = typing_hebrew(hebrew)
+
+            print()
+            print(f"  {T_YELLOW}Say:{T_RESET}   {pronunciation}")
+            print(f"  {T_MAGENTA}Type:{T_RESET}  {keys}")
+            print()
+            print(f"  {T_RED}COPY FOR DISCORD (looks wrong here, pastes correct):{T_RESET}")
+            print(f"  {T_RED}{hebrew}{T_RESET}")
+
+            if HAS_CLIPBOARD:
+                pyperclip.copy(hebrew)
+                print(f"  {T_GREEN}[copied to clipboard]{T_RESET}")
+
+            if speak_hebrew(hebrew):
+                print(f"  {T_GREEN}[playing audio]{T_RESET}")
+            print()
 
 def show_main_menu():
     print()
