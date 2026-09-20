@@ -161,6 +161,26 @@ def transliterate_word(word):
     text = re.sub(r'hh+', 'h', text)
     return text
 
+# QWERTY → Hebrew mapping (reverse of typing_hebrew)
+QWERTY_TO_HEBREW = {
+    't': 'א', 'c': 'ב', 'd': 'ג', 's': 'ד', 'v': 'ה', 'u': 'ו',
+    'z': 'ז', 'j': 'ח', 'y': 'ט', 'h': 'י', 'f': 'כ', 'l': 'ך',
+    'k': 'ל', 'n': 'מ', 'o': 'ם', 'b': 'נ', 'i': 'ן', 'x': 'ס',
+    'g': 'ע', 'p': 'פ', ';': 'ף', 'm': 'צ', '.': 'ץ', 'e': 'ק',
+    'r': 'ר', 'a': 'ש', ',': 'ת',
+}
+
+def keys_to_hebrew(keys_text):
+    """Convert QWERTY keys back to Hebrew letters."""
+    result = []
+    for char in keys_text:
+        lower = char.lower()
+        if lower in QWERTY_TO_HEBREW:
+            result.append(QWERTY_TO_HEBREW[lower])
+        elif char == ' ':
+            result.append(' ')
+    return ''.join(result)
+
 def typing_hebrew(text):
     """Convert Hebrew to Windows Standard Hebrew keyboard keys.
     Shows exactly what QWERTY keys to press."""
@@ -524,14 +544,25 @@ def show_letter_reference():
             pronunciation = transliterate_hebrew(hebrew)
             keys = typing_hebrew(hebrew)
 
+            # Convert keys back to Hebrew
+            hebrew_from_keys = keys_to_hebrew(keys)
+
             print()
             print(f"  {T_WHITE}English:{T_RESET}  {word}")
             print(f"  {T_YELLOW}Say:{T_RESET}      {pronunciation}")
             print(f"  {T_MAGENTA}Type:{T_RESET}     {keys}")
-            print(f"  {T_GRAY}(Hebrew output removed - use option 1/3 for reliable Hebrew){T_RESET}")
+            print(f"  {T_CYAN}Hebrew:{T_RESET}   {hebrew_from_keys}")
+            print()
+            print(f"  {T_GREEN}Copy for Discord:{T_RESET}")
+            print(f"  {hebrew_from_keys}")
+
+            # Copy to clipboard
+            if HAS_CLIPBOARD:
+                pyperclip.copy(hebrew_from_keys)
+                print(f"  {T_GREEN}[copied to clipboard]{T_RESET}")
 
             # TTS
-            if speak_hebrew(hebrew):
+            if speak_hebrew(hebrew_from_keys):
                 print(f"  {T_GREEN}[playing audio]{T_RESET}")
             print()
         else:
