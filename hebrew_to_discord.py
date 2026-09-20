@@ -306,7 +306,7 @@ def reverse_for_powershell(text):
 
 def format_terminal_full(lines_data):
     """Terminal with all 3 lines - Hebrew pre-reversed for correct PowerShell display"""
-    output = ""
+    output = f"{T_GRAY}[Hebrew below is for READING only - use option 4/5 to COPY]{T_RESET}\n\n"
     for item in lines_data:
         if item is None:
             output += f"{T_GRAY}---{T_RESET}\n\n"
