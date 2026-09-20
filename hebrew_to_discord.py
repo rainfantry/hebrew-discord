@@ -59,8 +59,12 @@ T_CYAN = "\033[96m"
 T_GREEN = "\033[92m"
 T_GRAY = "\033[90m"
 T_MAGENTA = "\033[95m"
+T_RED = "\033[91m"
 T_RESET = "\033[0m"
 T_BOLD = "\033[1m"
+
+# Store last option 2 result for option 3 practice
+last_practice_target = None
 
 HEBREW_PATTERN = re.compile(r'[֐-׿]')
 
@@ -547,14 +551,22 @@ def show_letter_reference():
             # Convert keys back to Hebrew
             hebrew_from_keys = keys_to_hebrew(keys)
 
+            # Store for option 3 practice
+            global last_practice_target
+            last_practice_target = {
+                'english': word,
+                'say': pronunciation,
+                'type': keys,
+                'hebrew': hebrew_from_keys
+            }
+
             print()
             print(f"  {T_WHITE}English:{T_RESET}  {word}")
             print(f"  {T_YELLOW}Say:{T_RESET}      {pronunciation}")
             print(f"  {T_MAGENTA}Type:{T_RESET}     {keys}")
-            print(f"  {T_CYAN}Hebrew:{T_RESET}   {hebrew_from_keys}")
             print()
-            print(f"  {T_GREEN}Copy for Discord:{T_RESET}")
-            print(f"  {hebrew_from_keys}")
+            print(f"  {T_RED}COPY FOR DISCORD (looks wrong here, pastes correct):{T_RESET}")
+            print(f"  {T_RED}{hebrew_from_keys}{T_RESET}")
 
             # Copy to clipboard
             if HAS_CLIPBOARD:
@@ -564,6 +576,8 @@ def show_letter_reference():
             # TTS
             if speak_hebrew(hebrew_from_keys):
                 print(f"  {T_GREEN}[playing audio]{T_RESET}")
+
+            print(f"\n  {T_GRAY}Go to option 3 to practice typing this{T_RESET}")
             print()
         else:
             print(f"  {T_GRAY}{hebrew}{T_RESET}")
@@ -577,6 +591,16 @@ def hebrew_practice_mode():
     print(f"{T_GRAY}  Paste Hebrew text, get pronunciation + keyboard keys{T_RESET}")
     print(f"{T_MAGENTA}{'=' * 60}{T_RESET}")
     print()
+
+    # Show practice target from option 2 if exists
+    global last_practice_target
+    if last_practice_target:
+        print(f"{T_GREEN}  ═══ PRACTICE TARGET (from option 2) ═══{T_RESET}")
+        print(f"  {T_WHITE}English:{T_RESET}  {last_practice_target['english']}")
+        print(f"  {T_YELLOW}Say:{T_RESET}      {last_practice_target['say']}")
+        print(f"  {T_MAGENTA}Type:{T_RESET}     {last_practice_target['type']}")
+        print(f"{T_GREEN}  ═════════════════════════════════════════{T_RESET}")
+        print()
 
     # Keyboard reference
     print(f"{T_CYAN}  QWERTY Keyboard:{T_RESET}")
@@ -625,8 +649,8 @@ def hebrew_practice_mode():
         print(f"  {T_YELLOW}Say:{T_RESET}   {pronunciation}")
         print(f"  {T_MAGENTA}Type:{T_RESET}  {keys}")
         print()
-        print(f"  {T_GREEN}Copy for Discord:{T_RESET}")
-        print(f"  {hebrew}")
+        print(f"  {T_RED}COPY FOR DISCORD (looks wrong here, pastes correct):{T_RESET}")
+        print(f"  {T_RED}{hebrew}{T_RESET}")
 
         # Copy to clipboard
         if HAS_CLIPBOARD:
