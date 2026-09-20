@@ -166,6 +166,33 @@ def format_discord(lines_data):
     output = output.rstrip('\n') + "\n```"
     return output
 
+def format_discord_chunked(lines_data, max_chars=1900):
+    """Discord ANSI split into chunks for non-Nitro (2000 char limit)"""
+    chunks = []
+    current_chunk = "```ansi\n"
+
+    for item in lines_data:
+        if item is None:
+            line_content = "\n"
+        else:
+            translit, english, hebrew = item
+            line_content = f"{D_YELLOW}{translit}{D_RESET}\n{D_WHITE}{english}{D_RESET}\n\n"
+
+        # Check if adding this would exceed limit
+        if len(current_chunk) + len(line_content) + 4 > max_chars:  # +4 for closing ```
+            current_chunk = current_chunk.rstrip('\n') + "\n```"
+            chunks.append(current_chunk)
+            current_chunk = "```ansi\n"
+
+        current_chunk += line_content
+
+    # Add final chunk
+    if current_chunk != "```ansi\n":
+        current_chunk = current_chunk.rstrip('\n') + "\n```"
+        chunks.append(current_chunk)
+
+    return chunks
+
 def format_terminal(lines_data):
     """Terminal colored - transliteration + english (no Hebrew - displays broken)"""
     output = ""
@@ -396,10 +423,15 @@ def main():
             print(f"{T_GREEN}✓ Saved: {filename}{T_RESET}")
 
         elif choice == "8":
-            content = format_discord(lines_data)
-            filename = save_file(content, "discord", "txt")
-            print(f"{T_GREEN}✓ Saved: {filename}{T_RESET}")
-            print(f"{T_GRAY}  (Copy contents and paste in Discord){T_RESET}")
+            chunks = format_discord_chunked(lines_data)
+            if len(chunks) == 1:
+                filename = save_file(chunks[0], "discord", "txt")
+                print(f"{T_GREEN}✓ Saved: {filename}{T_RESET}")
+            else:
+                print(f"{T_GREEN}✓ Split into {len(chunks)} messages (Discord 2000 char limit):{T_RESET}")
+                for i, chunk in enumerate(chunks, 1):
+                    filename = save_file(chunk, f"discord_part{i}", "txt")
+                    print(f"   {filename} ({len(chunk)} chars)")
 
         elif choice == "9":
             f1 = save_file(format_markdown(lines_data, True), "with_hebrew")
