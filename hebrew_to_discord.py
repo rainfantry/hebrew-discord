@@ -46,36 +46,98 @@ def is_hebrew(text):
     return bool(HEBREW_PATTERN.search(text))
 
 def transliterate_hebrew(text):
-    """Hebrew to Latin transliteration"""
+    """Hebrew to Latin transliteration with vowel inference"""
+
+    # Common Hebrew words with known transliterations
+    known_words = {
+        'שלום': 'shalom', 'ישראל': 'yisrael', 'עם': 'am', 'חי': 'chai',
+        'אהבה': 'ahava', 'לב': 'lev', 'טוב': 'tov', 'הכל': 'hakol',
+        'בקרוב': 'bekarov', 'תזרח': 'tizrach', 'השמש': 'hashemesh',
+        'שמש': 'shemesh', 'ימים': 'yamim', 'יפים': 'yafim', 'נדע': 'neda',
+        'הלב': 'halev', 'נלחם': 'nilcham', 'דאגות': 'de\'agot',
+        'כולם': 'kulam', 'יחזרו': 'yachzeru', 'הביתה': 'habaita',
+        'למטה': 'lemata', 'נחכה': 'nechake', 'להם': 'lahem',
+        'הלוואי': 'halevai', 'בשורות': 'besorot', 'טובות': 'tovot',
+        'לעולם': 'le\'olam', 'מפחד': 'mefached', 'הנצח': 'hanetzach',
+        'אפילו': 'afilu', 'כשקשה': 'kshe\'kashe', 'לראות': 'lirot',
+        'ביחד': 'beyachad', 'אחד': 'echad', 'פה': 'po', 'בודד': 'boded',
+        'שישרפו': 'sheyisrefu', 'המלחמות': 'hamilchamot',
+        'נשכח': 'nishkach', 'תמיד': 'tamid', 'להיות': 'lihiyot',
+        'מאוחדים': 'me\'uchadim', 'בעליות': 'ba\'aliyot',
+        'בירידות': 'biridot', 'גם': 'gam', 'בשעות': 'bisha\'ot',
+        'הכי': 'hachi', 'קשות': 'kashot', 'הקדוש': 'hakadosh',
+        'ברוך': 'baruch', 'הוא': 'hu', 'שומר': 'shomer', 'עלינו': 'aleinu',
+        'יכול': 'yachol', 'מי': 'mi', 'אין': 'ein', 'לנו': 'lanu',
+        'עוד': 'od', 'מדינה': 'medina', 'תעשה': 'ta\'ase',
+        'בנינו': 'beneinu', 'שמור': 'shmor', 'על': 'al',
+        'ילדינו': 'yaldeinu', 'אבדה': 'avda', 'האמונה': 'ha\'emuna',
+        'כי': 'ki', 'אם': 'im', 'לא': 'lo', 'את': 'et', 'של': 'shel',
+        'אני': 'ani', 'אתה': 'ata', 'היא': 'hi', 'הם': 'hem',
+        'יודע': 'yode\'a', 'רוצה': 'rotze', 'אוהב': 'ohev',
+        'חבר': 'chaver', 'חברה': 'chevra', 'בית': 'bayit',
+        'משפחה': 'mishpacha', 'אלוהים': 'elohim', 'ארץ': 'eretz',
+    }
+
+    words = text.split()
+    result_words = []
+
+    for word in words:
+        word_clean = word.strip()
+        if word_clean in known_words:
+            result_words.append(known_words[word_clean])
+        else:
+            # Fallback to letter-by-letter with vowel inference
+            result_words.append(transliterate_word(word_clean))
+
+    return ' '.join(w.capitalize() for w in result_words)
+
+def transliterate_word(word):
+    """Transliterate single word with vowel inference"""
     mapping = {
-        'א': "'", 'ב': 'v', 'ג': 'g', 'ד': 'd', 'ה': 'h', 'ו': 'o',
-        'ז': 'z', 'ח': 'ch', 'ט': 't', 'י': 'i', 'כ': 'ch', 'ך': 'ch',
+        'א': 'a', 'ב': 'v', 'ג': 'g', 'ד': 'd', 'ה': 'h', 'ו': 'o',
+        'ז': 'z', 'ח': 'ch', 'ט': 't', 'י': 'i', 'כ': 'kh', 'ך': 'kh',
         'ל': 'l', 'מ': 'm', 'ם': 'm', 'נ': 'n', 'ן': 'n', 'ס': 's',
-        'ע': "'", 'פ': 'f', 'ף': 'f', 'צ': 'tz', 'ץ': 'tz', 'ק': 'k',
+        'ע': 'a', 'פ': 'f', 'ף': 'f', 'צ': 'tz', 'ץ': 'tz', 'ק': 'k',
         'ר': 'r', 'ש': 'sh', 'ת': 't',
     }
 
-    combos = [('וו', 'v'), ('יי', 'ai'), ('וי', 'oi'), ('או', 'o'), ('אי', 'i'), ('יו', 'yo')]
-    result = text
-    for combo, replacement in combos:
-        result = result.replace(combo, replacement)
+    # Multi-char patterns (order matters)
+    patterns = [
+        ('וו', 'v'), ('יי', 'ai'), ('וי', 'oy'), ('או', 'o'),
+        ('אי', 'i'), ('יו', 'yo'), ('אה', 'a'), ('הי', 'hi'),
+        ('בר', 'bar'), ('שר', 'sar'),
+    ]
+
+    result = word
+    for pattern, replacement in patterns:
+        result = result.replace(pattern, f'_{replacement}_')
 
     output = []
-    for char in result:
-        if char in mapping:
+    i = 0
+    chars = list(result)
+
+    while i < len(chars):
+        char = chars[i]
+
+        if char == '_':
+            i += 1
+            continue
+        elif char in mapping:
             output.append(mapping[char])
-        elif char.isascii() or char.isspace():
+            # Add schwa (e) between consecutive consonants
+            if i + 1 < len(chars) and chars[i+1] in mapping and chars[i+1] not in 'אוי':
+                next_char = mapping.get(chars[i+1], '')
+                if next_char and next_char not in 'aeiou':
+                    output.append('e')
+        elif char.isascii():
             output.append(char)
-        elif '֐' <= char <= '׏':
-            pass
+        i += 1
 
     text = ''.join(output)
-    text = re.sub(r"'+", "'", text)
-    text = re.sub(r"'\s", " ", text)
-    text = re.sub(r"\s'", " ", text)
-    text = text.strip("'").strip()
-
-    return ' '.join(w.capitalize() for w in text.split())
+    # Clean up
+    text = re.sub(r'([aeiou])\1+', r'\1', text)  # Remove double vowels
+    text = re.sub(r'hh+', 'h', text)
+    return text
 
 _translator = None
 def translate_line(text):
@@ -228,7 +290,8 @@ def show_menu():
     print(f"{T_WHITE}{'=' * 50}{T_RESET}")
     print(f"  {T_YELLOW}6{T_RESET}. Save Markdown (with Hebrew)")
     print(f"  {T_YELLOW}7{T_RESET}. Save Markdown (transliteration only)")
-    print(f"  {T_YELLOW}8{T_RESET}. Save all formats")
+    print(f"  {T_YELLOW}8{T_RESET}. Save Discord format (.txt with ANSI)")
+    print(f"  {T_YELLOW}9{T_RESET}. Save ALL formats")
     print()
     print(f"  {T_GRAY}0{T_RESET}. Exit")
     print("-" * 50)
@@ -325,10 +388,17 @@ def main():
             print(f"{T_GREEN}✓ Saved: {filename}{T_RESET}")
 
         elif choice == "8":
+            content = format_discord(lines_data)
+            filename = save_file(content, "discord", "txt")
+            print(f"{T_GREEN}✓ Saved: {filename}{T_RESET}")
+            print(f"{T_GRAY}  (Copy contents and paste in Discord){T_RESET}")
+
+        elif choice == "9":
             f1 = save_file(format_markdown(lines_data, True), "with_hebrew")
             f2 = save_file(format_markdown(lines_data, False), "translit_only")
-            f3 = save_file(format_terminal_plain(lines_data), "plain", "txt")
-            print(f"{T_GREEN}✓ Saved: {f1}, {f2}, {f3}{T_RESET}")
+            f3 = save_file(format_discord(lines_data), "discord", "txt")
+            f4 = save_file(format_terminal_plain(lines_data), "plain", "txt")
+            print(f"{T_GREEN}✓ Saved: {f1}, {f2}, {f3}, {f4}{T_RESET}")
 
         else:
             print(f"{T_GRAY}Invalid choice{T_RESET}")
