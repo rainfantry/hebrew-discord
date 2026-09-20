@@ -3,6 +3,9 @@
 Hebrew Lyrics to Discord ANSI Formatter
 Paste full Hebrew lyrics, get Discord-ready colored output.
 Multiple output formats: Discord ANSI, Terminal, Markdown.
+
+Note: PowerShell cannot render RTL (Hebrew displays backwards).
+      Hebrew is preserved for Discord/Markdown export only.
 """
 import sys
 import re
@@ -24,15 +27,17 @@ except ImportError:
 
 # ANSI escape sequences for Discord
 ESC = "\x1b"
-YELLOW = f"{ESC}[2;33m"
-WHITE = f"{ESC}[2;37m"
-CYAN = f"{ESC}[2;36m"
-RESET = f"{ESC}[0m"
+D_YELLOW = f"{ESC}[2;33m"
+D_WHITE = f"{ESC}[2;37m"
+D_CYAN = f"{ESC}[2;36m"
+D_RESET = f"{ESC}[0m"
 
 # Terminal colors (standard ANSI)
 T_YELLOW = "\033[93m"
 T_WHITE = "\033[97m"
 T_CYAN = "\033[96m"
+T_GREEN = "\033[92m"
+T_GRAY = "\033[90m"
 T_RESET = "\033[0m"
 T_BOLD = "\033[1m"
 
@@ -85,36 +90,49 @@ def translate_line(text):
 # ============= OUTPUT FORMATTERS =============
 
 def format_discord(lines_data):
-    """Discord ANSI code block"""
+    """Discord ANSI code block - transliteration + english"""
     output = "```ansi\n"
     for item in lines_data:
         if item is None:
             output += "\n"
         else:
             translit, english, hebrew = item
-            output += f"{YELLOW}{translit}{RESET}\n"
-            output += f"{WHITE}{english}{RESET}\n\n"
+            output += f"{D_YELLOW}{translit}{D_RESET}\n"
+            output += f"{D_WHITE}{english}{D_RESET}\n\n"
     output = output.rstrip('\n') + "\n```"
     return output
 
 def format_terminal(lines_data):
-    """Terminal-friendly colored output"""
+    """Terminal colored - transliteration + english (no Hebrew - displays broken)"""
     output = ""
     for item in lines_data:
         if item is None:
-            output += "\n"
+            output += f"{T_GRAY}---{T_RESET}\n\n"
         else:
             translit, english, hebrew = item
             output += f"{T_YELLOW}{T_BOLD}{translit}{T_RESET}\n"
             output += f"{T_WHITE}{english}{T_RESET}\n\n"
     return output.rstrip('\n')
 
-def format_terminal_plain(lines_data):
-    """Terminal without colors (plain text)"""
+def format_terminal_full(lines_data):
+    """Terminal with all 3 lines (Hebrew will display backwards but included)"""
     output = ""
     for item in lines_data:
         if item is None:
-            output += "\n"
+            output += f"{T_GRAY}---{T_RESET}\n\n"
+        else:
+            translit, english, hebrew = item
+            output += f"{T_CYAN}{hebrew}{T_RESET}  {T_GRAY}(displays backwards in terminal){T_RESET}\n"
+            output += f"{T_YELLOW}{T_BOLD}{translit}{T_RESET}\n"
+            output += f"{T_WHITE}{english}{T_RESET}\n\n"
+    return output.rstrip('\n')
+
+def format_terminal_plain(lines_data):
+    """Plain text no colors"""
+    output = ""
+    for item in lines_data:
+        if item is None:
+            output += "---\n\n"
         else:
             translit, english, hebrew = item
             output += f"{translit}\n"
@@ -176,7 +194,7 @@ def process_lyrics(raw_text):
         if is_hebrew(line):
             translit = transliterate_hebrew(line)
             english = translate_line(line)
-            result.append((translit, english, line))  # Keep original Hebrew
+            result.append((translit, english, line))
             print(".", end="", flush=True)
         else:
             result.append((line, "", line))
@@ -191,34 +209,41 @@ def process_lyrics(raw_text):
 # ============= MENU =============
 
 def show_menu():
-    print("\n" + "=" * 50)
-    print("  OUTPUT OPTIONS")
-    print("=" * 50)
-    print("  1. Copy to clipboard (Discord ANSI)")
-    print("  2. Display in terminal (colored)")
-    print("  3. Display in terminal (plain)")
-    print("  4. Save as Markdown (with Hebrew)")
-    print("  5. Save as Markdown (without Hebrew)")
-    print("  6. Copy all formats to clipboard")
-    print("  0. Exit")
+    print()
+    print(f"{T_GREEN}{'=' * 50}{T_RESET}")
+    print(f"{T_GREEN}  DISPLAY OPTIONS{T_RESET}")
+    print(f"{T_GREEN}{'=' * 50}{T_RESET}")
+    print(f"  {T_YELLOW}1{T_RESET}. Show in terminal (transliteration + english)")
+    print(f"  {T_YELLOW}2{T_RESET}. Show in terminal (all 3: hebrew + translit + english)")
+    print(f"  {T_YELLOW}3{T_RESET}. Show plain text (no colors)")
+    print()
+    print(f"{T_CYAN}  COPY OPTIONS{T_RESET}")
+    print(f"{T_CYAN}{'=' * 50}{T_RESET}")
+    print(f"  {T_YELLOW}4{T_RESET}. Copy for Discord (ANSI colors)")
+    print(f"  {T_YELLOW}5{T_RESET}. Copy plain text")
+    print()
+    print(f"{T_WHITE}  EXPORT OPTIONS{T_RESET}")
+    print(f"{T_WHITE}{'=' * 50}{T_RESET}")
+    print(f"  {T_YELLOW}6{T_RESET}. Save Markdown (with Hebrew)")
+    print(f"  {T_YELLOW}7{T_RESET}. Save Markdown (transliteration only)")
+    print(f"  {T_YELLOW}8{T_RESET}. Save all formats")
+    print()
+    print(f"  {T_GRAY}0{T_RESET}. Exit")
     print("-" * 50)
-    return input("Choice [1]: ").strip() or "1"
+    return input("Choice: ").strip()
 
-def save_markdown(content, include_hebrew):
+def save_file(content, suffix, ext="md"):
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    suffix = "with_heb" if include_hebrew else "translit_only"
-    filename = f"lyrics_{suffix}_{timestamp}.md"
-
+    filename = f"lyrics_{suffix}_{timestamp}.{ext}"
     with open(filename, 'w', encoding='utf-8') as f:
         f.write(content)
-
     return filename
 
 def main():
-    print("=" * 50)
-    print("  Hebrew Lyrics → Multi-Format Converter")
-    print("  עברית → Discord / Terminal / Markdown")
-    print("=" * 50)
+    print(f"{T_GREEN}{'=' * 50}{T_RESET}")
+    print(f"{T_GREEN}  Hebrew Lyrics Converter{T_RESET}")
+    print(f"{T_GRAY}  Terminal / Discord / Markdown{T_RESET}")
+    print(f"{T_GREEN}{'=' * 50}{T_RESET}")
     print()
 
     raw_text = get_multiline_paste()
@@ -233,73 +258,78 @@ def main():
         print("No valid lines found.")
         return
 
-    # Preview
-    print("\nPreview (first 5 lines):")
+    # Quick preview (transliteration + english only - no broken Hebrew)
+    print(f"\n{T_GREEN}Preview:{T_RESET}")
     print("-" * 50)
     count = 0
     for item in lines_data:
         if item is None:
-            print("  ---")
+            print(f"  {T_GRAY}---{T_RESET}")
         else:
             translit, english, hebrew = item
             print(f"  {T_YELLOW}{translit}{T_RESET}")
             print(f"  {T_WHITE}> {english}{T_RESET}")
             count += 1
-            if count >= 5:
-                remaining = len([x for x in lines_data if x]) - 5
+            if count >= 3:
+                remaining = len([x for x in lines_data if x]) - 3
                 if remaining > 0:
-                    print(f"  ... +{remaining} more lines")
+                    print(f"  {T_GRAY}... +{remaining} more lines{T_RESET}")
                 break
     print("-" * 50)
+    print(f"{T_GRAY}(Hebrew preserved for Discord/Markdown export){T_RESET}")
 
     # Menu loop
     while True:
         choice = show_menu()
 
-        if choice == "0":
-            print("להתראות (lehitraot - goodbye)!")
+        if choice == "0" or choice == "":
+            print(f"{T_GREEN}lehitraot! (goodbye){T_RESET}")
             break
 
         elif choice == "1":
-            output = format_discord(lines_data)
-            if HAS_CLIPBOARD:
-                pyperclip.copy(output)
-                print("✓ Discord ANSI copied to clipboard!")
-            else:
-                print(output)
-                print("\n(Install pyperclip for clipboard support)")
+            print("\n" + format_terminal(lines_data))
 
         elif choice == "2":
-            print("\n" + format_terminal(lines_data))
+            print("\n" + format_terminal_full(lines_data))
 
         elif choice == "3":
             print("\n" + format_terminal_plain(lines_data))
 
         elif choice == "4":
-            content = format_markdown(lines_data, include_hebrew=True)
-            filename = save_markdown(content, include_hebrew=True)
-            print(f"✓ Saved to {filename}")
+            output = format_discord(lines_data)
+            if HAS_CLIPBOARD:
+                pyperclip.copy(output)
+                print(f"{T_GREEN}✓ Discord ANSI copied!{T_RESET}")
+            else:
+                print(output)
+                print(f"\n{T_GRAY}(pip install pyperclip for clipboard){T_RESET}")
 
         elif choice == "5":
-            content = format_markdown(lines_data, include_hebrew=False)
-            filename = save_markdown(content, include_hebrew=False)
-            print(f"✓ Saved to {filename}")
+            output = format_terminal_plain(lines_data)
+            if HAS_CLIPBOARD:
+                pyperclip.copy(output)
+                print(f"{T_GREEN}✓ Plain text copied!{T_RESET}")
+            else:
+                print(f"{T_GRAY}(pip install pyperclip for clipboard){T_RESET}")
 
         elif choice == "6":
-            if HAS_CLIPBOARD:
-                all_output = "=== DISCORD ===\n"
-                all_output += format_discord(lines_data)
-                all_output += "\n\n=== MARKDOWN (with Hebrew) ===\n"
-                all_output += format_markdown(lines_data, include_hebrew=True)
-                all_output += "\n\n=== PLAIN ===\n"
-                all_output += format_terminal_plain(lines_data)
-                pyperclip.copy(all_output)
-                print("✓ All formats copied to clipboard!")
-            else:
-                print("Need pyperclip for clipboard")
+            content = format_markdown(lines_data, include_hebrew=True)
+            filename = save_file(content, "with_hebrew")
+            print(f"{T_GREEN}✓ Saved: {filename}{T_RESET}")
+
+        elif choice == "7":
+            content = format_markdown(lines_data, include_hebrew=False)
+            filename = save_file(content, "translit_only")
+            print(f"{T_GREEN}✓ Saved: {filename}{T_RESET}")
+
+        elif choice == "8":
+            f1 = save_file(format_markdown(lines_data, True), "with_hebrew")
+            f2 = save_file(format_markdown(lines_data, False), "translit_only")
+            f3 = save_file(format_terminal_plain(lines_data), "plain", "txt")
+            print(f"{T_GREEN}✓ Saved: {f1}, {f2}, {f3}{T_RESET}")
 
         else:
-            print("Invalid choice")
+            print(f"{T_GRAY}Invalid choice{T_RESET}")
 
 if __name__ == "__main__":
     main()
