@@ -179,8 +179,11 @@ def format_terminal(lines_data):
     return output.rstrip('\n')
 
 def reverse_for_powershell(text):
-    """Reverse Hebrew text so PowerShell's broken RTL displays it correctly"""
-    return text[::-1]
+    """Reverse Hebrew text so PowerShell's broken RTL displays it correctly.
+    Only reverses if text contains Hebrew characters."""
+    if is_hebrew(text):
+        return text[::-1]
+    return text  # Don't reverse English/ASCII
 
 def format_terminal_full(lines_data):
     """Terminal with all 3 lines - Hebrew pre-reversed for correct PowerShell display"""
