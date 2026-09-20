@@ -546,7 +546,21 @@ def hebrew_practice_mode():
     print(f"{T_GRAY}  Paste Hebrew text, get pronunciation + keyboard keys{T_RESET}")
     print(f"{T_MAGENTA}{'=' * 60}{T_RESET}")
     print()
-    print(f"{T_GREEN}Type Hebrew words/phrases (or 'q' to quit):{T_RESET}")
+
+    # Keyboard reference
+    print(f"{T_CYAN}  QWERTY Keyboard:{T_RESET}")
+    print(f"  {T_YELLOW}┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┐{T_RESET}")
+    print(f"  {T_YELLOW}│{T_RESET} Q {T_YELLOW}│{T_RESET} W {T_YELLOW}│{T_RESET} E {T_YELLOW}│{T_RESET} R {T_YELLOW}│{T_RESET} T {T_YELLOW}│{T_RESET} Y {T_YELLOW}│{T_RESET} U {T_YELLOW}│{T_RESET} I {T_YELLOW}│{T_RESET} O {T_YELLOW}│{T_RESET} P {T_YELLOW}│{T_RESET}")
+    print(f"  {T_YELLOW}│{T_RESET} {T_CYAN}/{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}'{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ק{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ר{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}א{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ט{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ו{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ן{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ם{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}פ{T_RESET} {T_YELLOW}│{T_RESET}")
+    print(f"  {T_YELLOW}├───┼───┼───┼───┼───┼───┼───┼───┼───┼───┤{T_RESET}")
+    print(f"  {T_YELLOW}│{T_RESET} A {T_YELLOW}│{T_RESET} S {T_YELLOW}│{T_RESET} D {T_YELLOW}│{T_RESET} F {T_YELLOW}│{T_RESET} G {T_YELLOW}│{T_RESET} H {T_YELLOW}│{T_RESET} J {T_YELLOW}│{T_RESET} K {T_YELLOW}│{T_RESET} L {T_YELLOW}│{T_RESET} ; {T_YELLOW}│{T_RESET}")
+    print(f"  {T_YELLOW}│{T_RESET} {T_CYAN}ש{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ד{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ג{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}כ{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ע{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}י{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ח{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ל{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ך{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ף{T_RESET} {T_YELLOW}│{T_RESET}")
+    print(f"  {T_YELLOW}├───┼───┼───┼───┼───┼───┼───┼───┼───┼───┤{T_RESET}")
+    print(f"  {T_YELLOW}│{T_RESET} Z {T_YELLOW}│{T_RESET} X {T_YELLOW}│{T_RESET} C {T_YELLOW}│{T_RESET} V {T_YELLOW}│{T_RESET} B {T_YELLOW}│{T_RESET} N {T_YELLOW}│{T_RESET} M {T_YELLOW}│{T_RESET} , {T_YELLOW}│{T_RESET} . {T_YELLOW}│{T_RESET}")
+    print(f"  {T_YELLOW}│{T_RESET} {T_CYAN}ז{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ס{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ב{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ה{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}נ{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}מ{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}צ{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ת{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ץ{T_RESET} {T_YELLOW}│{T_RESET}")
+    print(f"  {T_YELLOW}└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┘{T_RESET}")
+    print()
+    print(f"{T_GREEN}Paste Hebrew words/phrases (or 'q' to quit):{T_RESET}")
     print()
 
     while True:
