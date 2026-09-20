@@ -37,6 +37,7 @@ T_WHITE = "\033[97m"
 T_CYAN = "\033[96m"
 T_GREEN = "\033[92m"
 T_GRAY = "\033[90m"
+T_MAGENTA = "\033[95m"
 T_RESET = "\033[0m"
 T_BOLD = "\033[1m"
 
@@ -139,6 +140,34 @@ def transliterate_word(word):
     text = re.sub(r'hh+', 'h', text)
     return text
 
+def typing_hebrew(text):
+    """Convert Hebrew to Windows Standard Hebrew keyboard keys.
+    Shows exactly what QWERTY keys to press."""
+
+    # Windows Standard Hebrew keyboard mapping (Israeli layout)
+    # Hebrew letter → QWERTY key to press
+    win_hebrew_map = {
+        'א': 't', 'ב': 'c', 'ג': 'd', 'ד': 's', 'ה': 'v', 'ו': 'u',
+        'ז': 'z', 'ח': 'j', 'ט': 'y', 'י': 'h', 'כ': 'f', 'ך': 'l',
+        'ל': 'k', 'מ': 'n', 'ם': 'o', 'נ': 'b', 'ן': 'i', 'ס': 'x',
+        'ע': 'g', 'פ': 'p', 'ף': ';', 'צ': 'm', 'ץ': '.', 'ק': 'e',
+        'ר': 'r', 'ש': 'a', 'ת': ',',
+    }
+
+    words = text.split()
+    result = []
+
+    for word in words:
+        typed = []
+        for char in word:
+            if char in win_hebrew_map:
+                typed.append(win_hebrew_map[char])
+            elif char.isascii():
+                typed.append(char)
+        result.append(''.join(typed).upper())
+
+    return ' '.join(result)
+
 _translator = None
 def translate_line(text):
     global _translator
@@ -160,7 +189,7 @@ def format_discord(lines_data):
         if item is None:
             output += "\n"
         else:
-            translit, english, hebrew = item
+            translit, english, hebrew, typing = item
             output += f"{D_YELLOW}{translit}{D_RESET}\n"
             output += f"{D_WHITE}{english}{D_RESET}\n\n"
     output = output.rstrip('\n') + "\n```"
@@ -175,7 +204,7 @@ def format_discord_chunked(lines_data, max_chars=1900, include_hebrew=False):
         if item is None:
             line_content = "\n"
         else:
-            translit, english, hebrew = item
+            translit, english, hebrew, typing = item
             if include_hebrew:
                 line_content = f"{D_CYAN}{hebrew}{D_RESET}\n{D_YELLOW}{translit}{D_RESET}\n{D_WHITE}{english}{D_RESET}\n\n"
             else:
@@ -203,7 +232,7 @@ def format_terminal(lines_data):
         if item is None:
             output += f"{T_GRAY}---{T_RESET}\n\n"
         else:
-            translit, english, hebrew = item
+            translit, english, hebrew, typing = item
             output += f"{T_YELLOW}{T_BOLD}{translit}{T_RESET}\n"
             output += f"{T_WHITE}{english}{T_RESET}\n\n"
     return output.rstrip('\n')
@@ -248,7 +277,7 @@ def format_terminal_full(lines_data):
         if item is None:
             output += f"{T_GRAY}---{T_RESET}\n\n"
         else:
-            translit, english, hebrew = item
+            translit, english, hebrew, typing = item
             hebrew_display = reverse_for_powershell(hebrew)
             output += f"{T_CYAN}{hebrew_display}{T_RESET}\n"
             output += f"{T_YELLOW}{T_BOLD}{translit}{T_RESET}\n"
@@ -262,7 +291,7 @@ def format_terminal_plain(lines_data):
         if item is None:
             output += "---\n\n"
         else:
-            translit, english, hebrew = item
+            translit, english, hebrew, typing = item
             output += f"{translit}\n"
             output += f"  {english}\n\n"
     return output.rstrip('\n')
@@ -274,7 +303,7 @@ def format_markdown(lines_data, include_hebrew=True):
         if item is None:
             output += "---\n\n"
         else:
-            translit, english, hebrew = item
+            translit, english, hebrew, typing = item
             if include_hebrew:
                 output += f"**{translit}** — {hebrew}\n"
             else:
@@ -322,10 +351,11 @@ def process_lyrics(raw_text):
         if is_hebrew(line):
             translit = transliterate_hebrew(line)
             english = translate_line(line)
-            result.append((translit, english, line))
+            typing = typing_hebrew(line)
+            result.append((translit, english, line, typing))
             print(".", end="", flush=True)
         else:
-            result.append((line, "", line))
+            result.append((line, "", line, ""))
 
     print(" done!")
 
@@ -358,6 +388,12 @@ def show_menu():
     print(f"  {T_YELLOW}9{T_RESET}. Save Discord (hebrew + translit + english)")
     print(f"  {T_YELLOW}10{T_RESET}. Save ALL formats")
     print()
+    print(f"{T_MAGENTA}  TYPING MODE (keyboard keys){T_RESET}")
+    print(f"{T_MAGENTA}{'=' * 50}{T_RESET}")
+    print(f"  {T_YELLOW}11{T_RESET}. Show typing (consonants only)")
+    print(f"  {T_YELLOW}12{T_RESET}. Copy typing for Discord")
+    print()
+    print(f"  {T_GRAY}M{T_RESET}. Back to main menu (letter reference)")
     print(f"  {T_GRAY}0{T_RESET}. Exit")
     print("-" * 50)
     return input("Choice: ").strip()
@@ -369,11 +405,135 @@ def save_file(content, suffix, ext="md"):
         f.write(content)
     return filename
 
+def show_letter_reference():
+    """Show Windows Standard Hebrew keyboard mapping"""
+    print()
+    print(f"{T_MAGENTA}{'=' * 60}{T_RESET}")
+    print(f"{T_MAGENTA}  Windows Hebrew Keyboard Reference{T_RESET}")
+    print(f"{T_GRAY}  Press these QWERTY keys to get Hebrew letters{T_RESET}")
+    print(f"{T_MAGENTA}{'=' * 60}{T_RESET}")
+    print()
+
+    # Visual QWERTY keyboard with Hebrew mappings
+    print(f"{T_CYAN}  QWERTY Keyboard Layout:{T_RESET}")
+    print()
+    print(f"  {T_YELLOW}┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┐{T_RESET}")
+    print(f"  {T_YELLOW}│{T_RESET} Q {T_YELLOW}│{T_RESET} W {T_YELLOW}│{T_RESET} E {T_YELLOW}│{T_RESET} R {T_YELLOW}│{T_RESET} T {T_YELLOW}│{T_RESET} Y {T_YELLOW}│{T_RESET} U {T_YELLOW}│{T_RESET} I {T_YELLOW}│{T_RESET} O {T_YELLOW}│{T_RESET} P {T_YELLOW}│{T_RESET}")
+    print(f"  {T_YELLOW}│{T_RESET} {T_CYAN}/{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}'{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ק{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ר{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}א{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ט{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ו{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ן{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ם{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}פ{T_RESET} {T_YELLOW}│{T_RESET}")
+    print(f"  {T_YELLOW}├───┼───┼───┼───┼───┼───┼───┼───┼───┼───┤{T_RESET}")
+    print(f"  {T_YELLOW}│{T_RESET} A {T_YELLOW}│{T_RESET} S {T_YELLOW}│{T_RESET} D {T_YELLOW}│{T_RESET} F {T_YELLOW}│{T_RESET} G {T_YELLOW}│{T_RESET} H {T_YELLOW}│{T_RESET} J {T_YELLOW}│{T_RESET} K {T_YELLOW}│{T_RESET} L {T_YELLOW}│{T_RESET} ; {T_YELLOW}│{T_RESET}")
+    print(f"  {T_YELLOW}│{T_RESET} {T_CYAN}ש{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ד{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ג{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}כ{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ע{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}י{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ח{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ל{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ך{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ף{T_RESET} {T_YELLOW}│{T_RESET}")
+    print(f"  {T_YELLOW}├───┼───┼───┼───┼───┼───┼───┼───┼───┼───┤{T_RESET}")
+    print(f"  {T_YELLOW}│{T_RESET} Z {T_YELLOW}│{T_RESET} X {T_YELLOW}│{T_RESET} C {T_YELLOW}│{T_RESET} V {T_YELLOW}│{T_RESET} B {T_YELLOW}│{T_RESET} N {T_YELLOW}│{T_RESET} M {T_YELLOW}│{T_RESET} , {T_YELLOW}│{T_RESET} . {T_YELLOW}│{T_RESET}")
+    print(f"  {T_YELLOW}│{T_RESET} {T_CYAN}ז{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ס{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ב{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ה{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}נ{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}מ{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}צ{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ת{T_RESET} {T_YELLOW}│{T_RESET} {T_CYAN}ץ{T_RESET} {T_YELLOW}│{T_RESET}")
+    print(f"  {T_YELLOW}└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┘{T_RESET}")
+    print()
+
+    # Windows Standard Hebrew keyboard - sorted by QWERTY key
+    mappings = [
+        ("A", "ש", "shin (sh)"),
+        ("B", "נ", "nun (n)"),
+        ("C", "ב", "bet (b/v)"),
+        ("D", "ג", "gimel (g)"),
+        ("E", "ק", "qof (k)"),
+        ("F", "כ", "kaf (k/kh)"),
+        ("G", "ע", "ayin (silent)"),
+        ("H", "י", "yod (y/i)"),
+        ("I", "ן", "nun sofit"),
+        ("J", "ח", "chet (ch)"),
+        ("K", "ל", "lamed (l)"),
+        ("L", "ך", "kaf sofit"),
+        ("M", "צ", "tsadi (tz)"),
+        ("N", "מ", "mem (m)"),
+        ("O", "ם", "mem sofit"),
+        ("P", "פ", "pe (p/f)"),
+        ("R", "ר", "resh (r)"),
+        ("S", "ד", "dalet (d)"),
+        ("T", "א", "alef (silent)"),
+        ("U", "ו", "vav (v/o/u)"),
+        ("V", "ה", "he (h)"),
+        ("X", "ס", "samekh (s)"),
+        ("Y", "ט", "tet (t)"),
+        ("Z", "ז", "zayin (z)"),
+        (",", "ת", "tav (t)"),
+        (".", "ץ", "tsadi sofit"),
+        (";", "ף", "pe sofit"),
+    ]
+
+    print(f"  {T_YELLOW}{'Key':<6}{T_RESET} {T_CYAN}{'Hebrew':<6}{T_RESET} {T_WHITE}Name{T_RESET}")
+    print(f"  {'-' * 40}")
+    for eng, heb, name in mappings:
+        print(f"  {T_YELLOW}{eng:<6}{T_RESET} {T_CYAN}{heb:<6}{T_RESET} {T_GRAY}{name}{T_RESET}")
+
+    print()
+    print(f"{T_GREEN}Type English words to get Hebrew + keyboard keys{T_RESET}")
+    print(f"{T_GRAY}(type 'q' to quit){T_RESET}")
+    print()
+
+    while True:
+        word = input(f"{T_YELLOW}English word: {T_RESET}").strip()
+        if not word or word.lower() == 'q':
+            break
+
+        # Translate English to Hebrew
+        try:
+            if HAS_TRANSLATE:
+                from deep_translator import MyMemoryTranslator
+                translator = MyMemoryTranslator(source='en-GB', target='he-IL')
+                hebrew = translator.translate(word)
+            else:
+                hebrew = "[install deep-translator]"
+        except:
+            hebrew = "[translation error]"
+
+        if hebrew and hebrew not in ["[translation error]", "[install deep-translator]"]:
+            pronunciation = transliterate_hebrew(hebrew)
+            keys = typing_hebrew(hebrew)
+
+            print()
+            print(f"  {T_WHITE}English:{T_RESET}  {word}")
+            print(f"  {T_CYAN}Hebrew:{T_RESET}   {reverse_for_powershell(hebrew)}")
+            print(f"  {T_YELLOW}Say:{T_RESET}      {pronunciation}")
+            print(f"  {T_MAGENTA}Type:{T_RESET}     {keys}")
+            print()
+        else:
+            print(f"  {T_GRAY}{hebrew}{T_RESET}")
+            print()
+
+def show_main_menu():
+    print()
+    print(f"{T_GREEN}{'=' * 50}{T_RESET}")
+    print(f"{T_GREEN}  Hebrew Lyrics Tool{T_RESET}")
+    print(f"{T_GRAY}  Learn Hebrew through songs{T_RESET}")
+    print(f"{T_GREEN}{'=' * 50}{T_RESET}")
+    print()
+    print(f"  {T_YELLOW}1{T_RESET}. Paste & process lyrics")
+    print(f"  {T_YELLOW}2{T_RESET}. Letter reference (QWERTY → Hebrew)")
+    print(f"  {T_GRAY}0{T_RESET}. Exit")
+    print("-" * 50)
+    return input("Choice: ").strip()
+
 def main():
-    print(f"{T_GREEN}{'=' * 50}{T_RESET}")
-    print(f"{T_GREEN}  Hebrew Lyrics Converter{T_RESET}")
-    print(f"{T_GRAY}  Terminal / Discord / Markdown{T_RESET}")
-    print(f"{T_GREEN}{'=' * 50}{T_RESET}")
+    while True:
+        choice = show_main_menu()
+
+        if choice == "0" or choice == "":
+            print(f"{T_GREEN}lehitraot! (להתראות){T_RESET}")
+            break
+
+        elif choice == "2":
+            show_letter_reference()
+            continue
+
+        elif choice == "1":
+            process_lyrics_workflow()
+
+        else:
+            print(f"{T_GRAY}Invalid choice{T_RESET}")
+
+def process_lyrics_workflow():
+    print()
+    print(f"{T_CYAN}Paste Hebrew lyrics, then type END on a new line:{T_RESET}")
     print()
 
     raw_text = get_multiline_paste()
@@ -396,7 +556,7 @@ def main():
         if item is None:
             print(f"  {T_GRAY}---{T_RESET}")
         else:
-            translit, english, hebrew = item
+            translit, english, hebrew, typing = item
             print(f"  {T_YELLOW}{translit}{T_RESET}")
             print(f"  {T_WHITE}> {english}{T_RESET}")
             count += 1
@@ -412,9 +572,14 @@ def main():
     while True:
         choice = show_menu()
 
+        if choice.lower() == "m":
+            print(f"{T_GRAY}Returning to main menu...{T_RESET}")
+            return
+
         if choice == "0" or choice == "":
-            print(f"{T_GREEN}lehitraot! (goodbye){T_RESET}")
-            break
+            print(f"{T_GREEN}lehitraot! (להתראות){T_RESET}")
+            import sys
+            sys.exit(0)
 
         elif choice == "1":
             print("\n" + format_terminal(lines_data))
@@ -480,6 +645,37 @@ def main():
             f3 = save_file(format_discord(lines_data), "discord", "txt")
             f4 = save_file(format_terminal_plain(lines_data), "plain", "txt")
             print(f"{T_GREEN}✓ Saved: {f1}, {f2}, {f3}, {f4}{T_RESET}")
+
+        elif choice == "11":
+            print()
+            print(f"{T_MAGENTA}TYPING MODE - exact keyboard keys{T_RESET}")
+            print(f"{T_GRAY}(Pronunciation = how to SAY it, Typing = what to TYPE){T_RESET}")
+            print()
+            for item in lines_data:
+                if item is None:
+                    print(f"  {T_GRAY}---{T_RESET}")
+                else:
+                    translit, english, hebrew, typing = item
+                    if typing:
+                        print(f"  {T_CYAN}{reverse_for_powershell(hebrew)}{T_RESET}")
+                        print(f"  {T_YELLOW}Say: {translit}{T_RESET}")
+                        print(f"  {T_MAGENTA}Type: {typing}{T_RESET}")
+                        print()
+
+        elif choice == "12":
+            output = "```ansi\n"
+            for item in lines_data:
+                if item is None:
+                    output += "\n"
+                else:
+                    translit, english, hebrew, typing = item
+                    if typing:
+                        output += f"{D_CYAN}{hebrew}{D_RESET}\n"
+                        output += f"{D_YELLOW}Say: {translit}{D_RESET}\n"
+                        output += f"\x1b[2;35mType: {typing}\x1b[0m\n\n"
+            output = output.rstrip('\n') + "\n```"
+            pyperclip.copy(output)
+            print(f"{T_GREEN}✓ Typing mode copied!{T_RESET}")
 
         else:
             print(f"{T_GRAY}Invalid choice{T_RESET}")
