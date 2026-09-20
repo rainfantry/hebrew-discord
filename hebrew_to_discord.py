@@ -258,6 +258,19 @@ def format_terminal(lines_data):
             output += f"{T_WHITE}{english}{T_RESET}\n\n"
     return output.rstrip('\n')
 
+def fix_reversed_words(text):
+    """Fix text where each Hebrew word is individually reversed.
+    Reverses each word back to correct form."""
+    words = text.split(' ')
+    fixed = []
+    for word in words:
+        if any('֐' <= c <= '׿' for c in word):
+            # Hebrew word - reverse it back
+            fixed.append(word[::-1])
+        else:
+            fixed.append(word)
+    return ' '.join(fixed)
+
 def reverse_for_powershell(text):
     """Reverse Hebrew portions only, keep English intact.
     PowerShell breaks RTL, so we pre-reverse Hebrew parts."""
@@ -511,10 +524,13 @@ def show_letter_reference():
             pronunciation = transliterate_hebrew(hebrew)
             keys = typing_hebrew(hebrew)
 
+            # Fix reversed words from API
+            hebrew_fixed = fix_reversed_words(hebrew)
+
             print()
             print(f"  {T_WHITE}English:{T_RESET}       {word}")
-            print(f"  {T_CYAN}Hebrew (PS):{T_RESET}   {reverse_for_powershell(hebrew)}")
-            print(f"  {T_CYAN}Hebrew (copy):{T_RESET} {hebrew}")
+            print(f"  {T_CYAN}Hebrew (PS):{T_RESET}   {reverse_for_powershell(hebrew_fixed)}")
+            print(f"  {T_CYAN}Hebrew (copy):{T_RESET} {hebrew_fixed}")
             print(f"  {T_YELLOW}Say:{T_RESET}          {pronunciation}")
             print(f"  {T_MAGENTA}Type:{T_RESET}         {keys}")
 
