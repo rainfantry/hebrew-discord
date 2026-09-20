@@ -525,6 +525,41 @@ def show_letter_reference():
             print(f"  {T_GRAY}{hebrew}{T_RESET}")
             print()
 
+def hebrew_practice_mode():
+    """Offline Hebrew practice - paste Hebrew, get pronunciation + typing keys"""
+    print()
+    print(f"{T_MAGENTA}{'=' * 60}{T_RESET}")
+    print(f"{T_MAGENTA}  Hebrew Practice Mode (OFFLINE){T_RESET}")
+    print(f"{T_GRAY}  Paste Hebrew text, get pronunciation + keyboard keys{T_RESET}")
+    print(f"{T_MAGENTA}{'=' * 60}{T_RESET}")
+    print()
+    print(f"{T_GREEN}Type Hebrew words/phrases (or 'q' to quit):{T_RESET}")
+    print()
+
+    while True:
+        hebrew = input(f"{T_CYAN}Hebrew: {T_RESET}").strip()
+        if not hebrew or hebrew.lower() == 'q':
+            break
+
+        # Check if actually Hebrew
+        if not any('֐' <= c <= '׿' for c in hebrew):
+            print(f"  {T_GRAY}(not Hebrew text){T_RESET}")
+            print()
+            continue
+
+        pronunciation = transliterate_hebrew(hebrew)
+        keys = typing_hebrew(hebrew)
+
+        print()
+        print(f"  {T_CYAN}Hebrew:{T_RESET}   {reverse_for_powershell(hebrew)}")
+        print(f"  {T_YELLOW}Say:{T_RESET}      {pronunciation}")
+        print(f"  {T_MAGENTA}Type:{T_RESET}     {keys}")
+
+        # TTS
+        if speak_hebrew(hebrew):
+            print(f"  {T_GREEN}[playing audio]{T_RESET}")
+        print()
+
 def show_main_menu():
     print()
     print(f"{T_GREEN}{'=' * 50}{T_RESET}")
@@ -533,7 +568,8 @@ def show_main_menu():
     print(f"{T_GREEN}{'=' * 50}{T_RESET}")
     print()
     print(f"  {T_YELLOW}1{T_RESET}. Paste & process lyrics")
-    print(f"  {T_YELLOW}2{T_RESET}. Letter reference (QWERTY → Hebrew)")
+    print(f"  {T_YELLOW}2{T_RESET}. English → Hebrew (online translation)")
+    print(f"  {T_YELLOW}3{T_RESET}. Hebrew practice (offline - paste Hebrew)")
     print(f"  {T_GRAY}0{T_RESET}. Exit")
     print("-" * 50)
     return input("Choice: ").strip()
@@ -548,6 +584,10 @@ def main():
 
         elif choice == "2":
             show_letter_reference()
+            continue
+
+        elif choice == "3":
+            hebrew_practice_mode()
             continue
 
         elif choice == "1":
