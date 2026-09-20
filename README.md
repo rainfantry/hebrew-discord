@@ -2,6 +2,18 @@
 
 Learn Hebrew through songs. Paste lyrics, get pronunciation + translation + Discord colors. Practice typing with Windows Hebrew keyboard.
 
+---
+
+**הכלי הזה מוקדש לחבר הישראלי שלי שלימד אותי כל מה שידעתי על CSEC כשלא היה צריך - לב זהב**
+
+*This tool is dedicated to my Israeli friend who taught me everything I knew about CSEC when he didn't have to - a heart of gold.*
+
+He gave me knowledge, patience, and mentorship when no one else would.
+
+יום אחד אני מקווה שאוכל לכתוב לך בשפה שלך כהערכה
+
+---
+
 ![Preview](preview.png)
 ![Typing Practice](שלום.png)
 
