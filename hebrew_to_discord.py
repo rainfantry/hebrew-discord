@@ -512,10 +512,11 @@ def show_letter_reference():
             keys = typing_hebrew(hebrew)
 
             print()
-            print(f"  {T_WHITE}English:{T_RESET}  {word}")
-            print(f"  {T_CYAN}Hebrew:{T_RESET}   {reverse_for_powershell(hebrew)}")
-            print(f"  {T_YELLOW}Say:{T_RESET}      {pronunciation}")
-            print(f"  {T_MAGENTA}Type:{T_RESET}     {keys}")
+            print(f"  {T_WHITE}English:{T_RESET}       {word}")
+            print(f"  {T_CYAN}Hebrew (PS):{T_RESET}   {reverse_for_powershell(hebrew)}")
+            print(f"  {T_CYAN}Hebrew (copy):{T_RESET} {hebrew}")
+            print(f"  {T_YELLOW}Say:{T_RESET}          {pronunciation}")
+            print(f"  {T_MAGENTA}Type:{T_RESET}         {keys}")
 
             # TTS
             if speak_hebrew(hebrew):
@@ -551,9 +552,10 @@ def hebrew_practice_mode():
         keys = typing_hebrew(hebrew)
 
         print()
-        print(f"  {T_CYAN}Hebrew:{T_RESET}   {reverse_for_powershell(hebrew)}")
-        print(f"  {T_YELLOW}Say:{T_RESET}      {pronunciation}")
-        print(f"  {T_MAGENTA}Type:{T_RESET}     {keys}")
+        print(f"  {T_CYAN}Hebrew (PS):{T_RESET}   {reverse_for_powershell(hebrew)}")
+        print(f"  {T_CYAN}Hebrew (copy):{T_RESET} {hebrew}")
+        print(f"  {T_YELLOW}Say:{T_RESET}          {pronunciation}")
+        print(f"  {T_MAGENTA}Type:{T_RESET}         {keys}")
 
         # TTS
         if speak_hebrew(hebrew):
