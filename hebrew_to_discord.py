@@ -166,7 +166,7 @@ def format_discord(lines_data):
     output = output.rstrip('\n') + "\n```"
     return output
 
-def format_discord_chunked(lines_data, max_chars=1900):
+def format_discord_chunked(lines_data, max_chars=1900, include_hebrew=False):
     """Discord ANSI split into chunks for non-Nitro (2000 char limit)"""
     chunks = []
     current_chunk = "```ansi\n"
@@ -176,7 +176,10 @@ def format_discord_chunked(lines_data, max_chars=1900):
             line_content = "\n"
         else:
             translit, english, hebrew = item
-            line_content = f"{D_YELLOW}{translit}{D_RESET}\n{D_WHITE}{english}{D_RESET}\n\n"
+            if include_hebrew:
+                line_content = f"{D_CYAN}{hebrew}{D_RESET}\n{D_YELLOW}{translit}{D_RESET}\n{D_WHITE}{english}{D_RESET}\n\n"
+            else:
+                line_content = f"{D_YELLOW}{translit}{D_RESET}\n{D_WHITE}{english}{D_RESET}\n\n"
 
         # Check if adding this would exceed limit
         if len(current_chunk) + len(line_content) + 4 > max_chars:  # +4 for closing ```
@@ -325,8 +328,9 @@ def show_menu():
     print(f"{T_WHITE}{'=' * 50}{T_RESET}")
     print(f"  {T_YELLOW}6{T_RESET}. Save Markdown (with Hebrew)")
     print(f"  {T_YELLOW}7{T_RESET}. Save Markdown (transliteration only)")
-    print(f"  {T_YELLOW}8{T_RESET}. Save Discord format (.txt with ANSI)")
-    print(f"  {T_YELLOW}9{T_RESET}. Save ALL formats")
+    print(f"  {T_YELLOW}8{T_RESET}. Save Discord (transliteration + english)")
+    print(f"  {T_YELLOW}9{T_RESET}. Save Discord (hebrew + translit + english)")
+    print(f"  {T_YELLOW}10{T_RESET}. Save ALL formats")
     print()
     print(f"  {T_GRAY}0{T_RESET}. Exit")
     print("-" * 50)
@@ -423,17 +427,28 @@ def main():
             print(f"{T_GREEN}✓ Saved: {filename}{T_RESET}")
 
         elif choice == "8":
-            chunks = format_discord_chunked(lines_data)
+            chunks = format_discord_chunked(lines_data, include_hebrew=False)
             if len(chunks) == 1:
                 filename = save_file(chunks[0], "discord", "txt")
                 print(f"{T_GREEN}✓ Saved: {filename}{T_RESET}")
             else:
-                print(f"{T_GREEN}✓ Split into {len(chunks)} messages (Discord 2000 char limit):{T_RESET}")
+                print(f"{T_GREEN}✓ Split into {len(chunks)} messages:{T_RESET}")
                 for i, chunk in enumerate(chunks, 1):
                     filename = save_file(chunk, f"discord_part{i}", "txt")
                     print(f"   {filename} ({len(chunk)} chars)")
 
         elif choice == "9":
+            chunks = format_discord_chunked(lines_data, include_hebrew=True)
+            if len(chunks) == 1:
+                filename = save_file(chunks[0], "discord_heb", "txt")
+                print(f"{T_GREEN}✓ Saved: {filename}{T_RESET}")
+            else:
+                print(f"{T_GREEN}✓ Split into {len(chunks)} messages (with Hebrew):{T_RESET}")
+                for i, chunk in enumerate(chunks, 1):
+                    filename = save_file(chunk, f"discord_heb_part{i}", "txt")
+                    print(f"   {filename} ({len(chunk)} chars)")
+
+        elif choice == "10":
             f1 = save_file(format_markdown(lines_data, True), "with_hebrew")
             f2 = save_file(format_markdown(lines_data, False), "translit_only")
             f3 = save_file(format_discord(lines_data), "discord", "txt")
