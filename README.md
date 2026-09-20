@@ -2,6 +2,8 @@
 
 Learn Hebrew through songs. Paste lyrics, get pronunciation + translation + Discord colors.
 
+![Preview](preview.png)
+
 ## Install
 
 ```powershell
