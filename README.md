@@ -3,6 +3,7 @@
 Learn Hebrew through songs. Paste lyrics, get pronunciation + translation + Discord colors. Practice typing with Windows Hebrew keyboard.
 
 ![Preview](preview.png)
+![Typing Practice](שלום.png)
 
 ## Install
 
