@@ -9,9 +9,10 @@ Learn Hebrew through songs. Paste lyrics, get pronunciation + translation + Disc
 
 ```powershell
 pip install -r requirements.txt
+pip install edge-tts  # optional: for Hebrew TTS
 ```
 
-Requirements: `pyperclip`, `deep-translator`
+Requirements: `pyperclip`, `deep-translator`, `edge-tts` (optional)
 
 ## Usage
 
@@ -23,10 +24,13 @@ python hebrew_to_discord.py
 
 | Option | Description |
 |--------|-------------|
-| 1 | Paste & process lyrics |
-| 2 | Typing practice (English → Hebrew + keyboard keys) |
+| 1 | Paste & process lyrics (copy from websites) |
+| 2 | English → pronunciation + keys + TTS |
+| 3 | Hebrew practice (offline - paste Hebrew) |
 
 ## Option 1: Lyrics Workflow
+
+Best for learning songs. Copy Hebrew lyrics from websites (Genius, etc.) and paste.
 
 1. Paste Hebrew lyrics
 2. Type `END` on new line
@@ -39,10 +43,12 @@ python hebrew_to_discord.py
 | 2 | Show all 3: Hebrew + transliteration + English |
 | 3 | Show plain text (no colors) |
 
+Note: Terminal Hebrew is reversed for PowerShell display. Use copy/export options for correct Hebrew.
+
 ### Copy (Clipboard)
 | Option | Description |
 |--------|-------------|
-| 4 | Copy Discord ANSI (full song - use with Nitro) |
+| 4 | Copy Discord ANSI (correct Hebrew for Discord) |
 | 5 | Copy plain text |
 
 ### Export (Save to File)
@@ -50,7 +56,7 @@ python hebrew_to_discord.py
 |--------|-------------|
 | 6 | Save Markdown (with Hebrew) |
 | 7 | Save Markdown (transliteration only) |
-| 8 | Save Discord (translit + english) - auto-chunks for non-Nitro |
+| 8 | Save Discord (translit + english) - auto-chunks |
 | 9 | Save Discord (hebrew + translit + english) - auto-chunks |
 | 10 | Save ALL formats |
 
@@ -61,9 +67,26 @@ python hebrew_to_discord.py
 | 12 | Copy typing for Discord |
 | M | Back to main menu |
 
-## Option 2: Typing Practice
+## Option 2: English → Pronunciation
 
-Interactive mode with visual QWERTY → Hebrew keyboard reference:
+Type English words, get:
+- **Say:** pronunciation (transliteration)
+- **Type:** keyboard keys for Windows Hebrew
+- **TTS:** audio plays automatically
+
+Note: Hebrew text output removed (translation API unreliable). Use option 1/3 for reliable Hebrew.
+
+## Option 3: Hebrew Practice (Offline)
+
+Paste Hebrew text directly. No internet needed.
+
+- **Say:** pronunciation
+- **Type:** keyboard keys
+- **TTS:** audio plays
+
+## Windows Hebrew Keyboard
+
+Visual QWERTY → Hebrew reference:
 
 ```
   ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┐
@@ -78,17 +101,10 @@ Interactive mode with visual QWERTY → Hebrew keyboard reference:
   └───┴───┴───┴───┴───┴───┴───┴───┴───┴───┘
 ```
 
-Type English words, get:
-- **Hebrew:** שלום (actual translation)
-- **Say:** Shalom (pronunciation)
-- **Type:** AKUO (Windows Hebrew keyboard keys)
-
-### Windows Hebrew Keyboard Setup
-
+### Setup
 1. Windows Settings → Time & Language → Language
-2. Add Hebrew
-3. Use "Hebrew" layout (not "Standard")
-4. Win+Space to switch keyboards
+2. Add Hebrew (use "Hebrew" layout, not "Standard")
+3. Win+Space to switch keyboards
 
 ### Example Words
 
@@ -101,35 +117,26 @@ Type English words, get:
 | what | מה | Ma | NV |
 | love | אהבה | Ahava | TVCT |
 
-## Discord Colors
-
-```
-בקרוב תזרח השמש          <- cyan (hebrew)
-Bekarov Tizrach Hashemesh  <- yellow (transliteration)
-The sun is coming up       <- white (english)
-```
-
 ## Features
 
-### Windows Hebrew Keyboard Support
-- Visual QWERTY → Hebrew keyboard map
-- Shows exact keys to press (AKUO not "shalom")
-- Works with Windows Standard Hebrew layout
+### TTS (Text-to-Speech)
+- Hebrew pronunciation plays automatically
+- Uses Microsoft Edge neural voices
+- Requires `edge-tts` and internet
 
 ### Transliteration (Offline)
 - 40+ common Hebrew words pre-mapped
 - Vowel inference for unknown words
-- No internet needed
 
-### Translation (Online)
-- Uses MyMemory API
-- Requires internet
-- Falls back to `[translation error]` if offline
+### Windows Hebrew Keyboard
+- Visual QWERTY → Hebrew map
+- Shows exact keys (AKUO not "shalom")
+- Works with Windows Standard Hebrew layout
 
-### Auto-Chunking (Non-Nitro)
+### Auto-Chunking
 - Discord limit: 2000 chars without Nitro
-- Export options 8/9 auto-split into multiple files
+- Export options auto-split into multiple files
 
-### PowerShell RTL Fix
-- Hebrew auto-reversed for terminal display
-- PowerShell's broken RTL re-reverses it = correct display
+### PowerShell RTL
+- Terminal display reverses Hebrew for readability
+- Copy/export options preserve correct Hebrew
