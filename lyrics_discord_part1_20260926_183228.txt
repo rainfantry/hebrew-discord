@@ -1,0 +1,71 @@
+```ansi
+[2;33mAez Im Et Lo Ohevet Oti[0m
+[2;37mSo if you don't like me[0m
+
+[2;33mTegiedi Meh Aeshiet Iti[0m
+[2;37mTell me what you did with me[0m
+
+[2;33mChesheveti Zeh Aemieti[0m
+[2;37mI thought it was real[0m
+
+[2;33mAekheshyo Helekhet Oin Oti, Ein Oti Ein Oti[0m
+[2;37mNow you've gone and there's no me, there's no me, there's no me[0m
+
+[2;33mEt Aesh Aevel Ani Ein Oti[0m
+[2;37mYou are fire but I am not me[0m
+
+
+[2;33mTegiedi Li[0m
+[2;37mTell me![0m
+
+[2;33mIkh Hyofi Shelekh Khekheh Mesheker Oti[0m
+[2;37mHow your beauty like that lies to me[0m
+
+[2;33mMeshecheket Li Baraesh Oezeh Goemer Oti[0m
+[2;37mPlaying with my head and it's killing me[0m
+
+[2;33mHoefekhet Et Hekhoel Lemesoevekh Iti[0m
+[2;37mMakes everything complicated with me[0m
+
+
+[2;33mOli Teziezi Li[0m
+[2;37mMaybe you'll move me[0m
+
+[2;33mEt Hegeder Mechoetz Lelev Shelekh[0m
+[2;37mthe fence outside your heart[0m
+
+[2;33mZeh Shoeret Oti[0m
+[2;37mIt scratches me[0m
+
+[2;33mEt Lo Mevieneh Shezeh Defoek Oaet Ohevet Oti[0m
+[2;37mYou don't understand it's fucked up and you love me[0m
+
+[2;33mAel Tesetekheli Aelai, Ael Tesetekheli Aelai[0m
+[2;37mDon't look at me, don't look at me[0m
+
+[2;33mEt Yodaet Zeh Mecheliesh Oti[0m
+[2;37mYou know, it weakens me.[0m
+
+
+[2;33mIm Et Lo Ohevet Oti[0m
+[2;37mIf you don't like me[0m
+
+[2;33mTegiedi Meh Aeshiet Iti[0m
+[2;37mTell me what you did with me[0m
+
+[2;33mChesheveti Zeh Aemieti[0m
+[2;37mI thought it was real[0m
+
+[2;33mAekheshyo Helekhet Oin Oti, Ein Oti Ein Oti[0m
+[2;37mNow you've gone and there's no me, there's no me, there's no me[0m
+
+[2;33mEt Aesh Aevel Ani Ein Oti[0m
+[2;37mYou are fire but I am not me[0m
+
+
+[2;33mAez Im Et Lo Ohevet Oti[0m
+[2;37mSo if you don't like me[0m
+
+[2;33mTegiedi Meh Aeshiet Iti[0m
+[2;37mTell me what you did with me[0m
+```
